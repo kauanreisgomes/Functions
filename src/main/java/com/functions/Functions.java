@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -28,10 +29,12 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/**
+ * @apiNote Classe de Funções gerais
+ * @author kauan reis
+ */
 public class Functions {
 	public static int index;
-	private static String p = "4d7361626f7240393030";
 	
 
 	
@@ -318,8 +321,26 @@ public class Functions {
 		}
 		return l;
 }
+	
+	/**
+	 * @apiNote Executa um comando no cmd do computador.
+	 * @param command 
+	 */
+	public static void ExecuteCommandLine(String command){
+		try {
+			Runtime.getRuntime().exec(command);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * @apiNote Adiciona valores em um arquivo JSON (normalmente), podendo ser alterado para outros tipos de arquivos.
+	 * @apiNote 0 - option
+	 * @apiNote 1 - File PATH
+	 * @apiNote 2 - option 1 - JSONObject || option 2 - String
+	 * @throws IOException
 	 * @param parametros
 	 */
 	public static void addvalues(Object[] parametros){
@@ -351,7 +372,7 @@ public class Functions {
 			
 		}else{
 			String log = (String)parametros[2];
-			
+		
 			File f = new File((String)parametros[1]);
 			if(f.exists()){
 				try (FileWriter fw = new FileWriter(f)) {
@@ -378,21 +399,11 @@ public class Functions {
 	}
 
 	/**
-	 * @apiNote Executa um comando no cmd do computador.
-	 * @param command 
-	 */
-	public static void ExecuteCommandLine(String command){
-		try {
-			Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * @apiNote 1 - option (int)
-	 * @apiNote 2 - local\nomdoarquivo.txt(String)
+	 * @apiNote 0 - option (int)
+	 * @apiNote 1 - local\nomdoarquivo.txt (String)
+	 * @throws NullPointerException
+	 * @throws JSONException
+	 * @throws IOException
 	 * @param parametros
 	 * @return
 	 */ 
@@ -434,7 +445,6 @@ public class Functions {
 			}else{
 				try {
 					if(f.createNewFile() == true){
-					
 						lista = getvalues(parametros);
 					}else{
 						lista.add(false);
@@ -444,22 +454,22 @@ public class Functions {
 					e.printStackTrace();
 					lista.add(false);
 				}
-			}
-			
-			
+			}	
 		}
 		
 		return lista;
 	}
 
 	/**
-	 * @apiNote Ler arquivos da pasta json, sendo necessário somento o nome do arquivo. Ex: config, version...
+	 * @apiNote Ler arquivos da pasta json, sendo necessário somento o File. 
 	 * @param arquivo
 	 * @return
+	 * @throws FileNotFoundException
+	 * @throws JSONException
 	 */
-	/*public static JSONObject JsonReader(String arquivo){
-		if(!arquivo.equals("config")){
-			try (Scanner scanner = new Scanner(Main.class.getResourceAsStream("json/"+arquivo+".json")).useDelimiter("\\n")) {
+	public static JSONObject JsonReader(File arquivo){
+		if(arquivo.exists()){
+			try (Scanner scanner = new Scanner(new FileInputStream(arquivo)).useDelimiter("\\n")) {
 				
 				String json = "";
 				while(scanner.hasNext()){
@@ -467,27 +477,18 @@ public class Functions {
 				}
 				JSONObject jsonobj = new JSONObject(json);
 				return jsonobj;
-			} catch (JSONException e) {
+			} catch (JSONException | FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else{
-			InputStream input = Main.class.getResourceAsStream("json/config.json");
-			String json;
-			try {
-				json = new String(FileDE.dencode(new String(Hex.decodeHex(p)),input), "UTF-8");
-				
-				JSONObject jsonobj = new JSONObject(json);
-				return jsonobj;
-			} catch (IOException | DecoderException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+        }else{
+            
+        }
+		
 		return null;
 	
 	}
-*/
+
 	/**
 	 * @apiNote Cria um arquivo temporario no temp/GPE. Recebendo o local do arquivo que vai ser movido e o nome
 	 * @param location
@@ -497,7 +498,7 @@ public class Functions {
 	public static Object createFileTemp(File file,String fileName){
 		
         //caminho da imagem dentro da pasta tmp do sistema
-        String destino = System.getenv("APPDATA")+"/GPE" + fileName;
+        String destino = System.getenv("APPDATA")+"/" + fileName;
 
 		System.out.println(System.getenv("APPDATA"));
         try (InputStream inputImagem = new FileInputStream(file)) {
@@ -531,7 +532,11 @@ public class Functions {
 		}
 	}
 	
-
+	/***
+	 * @apiNote Verifica se o CNPJ é válido, recebendo uma string com o CNPJ como parametro
+	 * @param CNPJ
+	 * @return
+	 */
 	public static boolean isCNPJ(String CNPJ) {
 		// considera-se erro CNPJ's formados por uma sequencia de numeros iguais
 			if (CNPJ.equals("00000000000000") || CNPJ.equals("11111111111111") ||
@@ -590,7 +595,11 @@ public class Functions {
 				return(false);
 			}
 	}
-
+	/***
+	 * @apiNote Verifica se o CPF é válido, recebendo uma string com o CPF como parametro
+	 * @param CNPJ
+	 * @return
+	 */
 	public static boolean isCPF(String CPF) {
         // considera-se erro CPF's formados por uma sequencia de numeros iguais
         if (CPF.equals("00000000000") ||
@@ -647,22 +656,30 @@ public class Functions {
             }
         }
 
-		public static boolean filtro(String valor) {
-			if (Functions.isNull(valor)) {
-				return true;
-			}
-	
-			try {
-				Integer.parseInt(valor);
-			} catch (NumberFormatException e) {
-				return true;
-			}
-	
-			// Se não tiver letras ou simbolos alem de numeros ele retorna false
-			if (!(valor.matches("[+-]?\\d*(\\.\\d+)?")) || valor.contains(".") || valor.contains(",")) {
-				return true;
-			}
-	
-			return false;
+	/**
+	 * @apiNote Filtro para verificar se é inteiro
+	 * @apiNote Use a função verify ao inves desta!
+	 * @deprecated
+	 * @param valor
+	 * @return
+	 */
+	@Deprecated
+	public static boolean filtro(String valor) {
+		if (Functions.isNull(valor)) {
+			return true;
 		}
+
+		try {
+			Integer.parseInt(valor);
+		} catch (NumberFormatException e) {
+			return true;
+		}
+
+		// Se não tiver letras ou simbolos alem de numeros ele retorna false
+		if (!(valor.matches("[+-]?\\d*(\\.\\d+)?")) || valor.contains(".") || valor.contains(",")) {
+			return true;
+		}
+
+		return false;
+	}
 }

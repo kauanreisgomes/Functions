@@ -8,13 +8,26 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.functions.models.Combobox;
 import com.functions.models.Objeto;
 
+/**
+ * @apiNote Classe de conexão com o banco de dados
+ * @author kauan reis
+ */
 public class Query {
     private volatile static Connection con;
 	private volatile static boolean open = false;
 	private volatile String url,user,pw;
 
+	/**
+	 * @apiNote SQL Server: jdbc:sqlserver://192.168.254.202:1433;databaseName=;user=;password=;encrypt=true;trustServerCertificate=true;hostNameInCertificate=cr2.eastus1-a.control.database.windows.net;loginTimeout=30;
+	 * @apiNote Oracle: jdbc:oracle:thin:@hostname:port:database
+	 * @apiNote MySQL: jdbc:mysql://localhost:33060/sakila
+	 * @param url
+	 * @param user
+	 * @param pw
+	 */
 	public Query(String url, String user,String pw) {
 		this.url = url;
 		this.user = user;
@@ -377,6 +390,58 @@ public class Query {
 		}
 
 		return valor;
+	}
+
+	// Um dado extra
+	/***
+	 * Pega uma String sql e pega um id e um nome. Sintaxe:
+	 * *SELECT valor1 as id, valor2 as nome FROM tabela*
+	 * Possivel também:
+	 * *SELECT valor1 as id, valor2 as nome, valor3 as dado FROM tabela*
+	 * 
+	 * @return List<Combobox>
+	 * @category Com retorno, ligação com banco de dados.
+	 * @exception SQLException
+	 * @author Kauan t.i
+	 ***/
+	public List<Combobox> listCb(String sql) {
+		List<Combobox> l = new ArrayList<>();
+		if (!(sql == null || sql.isEmpty())) {
+
+			try {
+				if(open){
+					if(con == null || con.isClosed()){
+						con = ConnectionFactory.getConnection(url,user,pw);
+					}
+				}
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			try(PreparedStatement ps = con.prepareStatement(sql)){
+				ResultSet rs = ps.executeQuery();
+				while (rs.next()) {
+					Combobox i = new Combobox(rs.getInt("id"), rs.getString("nome"));
+					ResultSetMetaData rsmd = rs.getMetaData();
+
+					if (rsmd.getColumnCount() > 2) {
+						i.setDadoextra(rs.getString("dado"));
+					}
+					l.add(i);
+
+				}
+				rs.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("Erro ao executar o comando no banco de dados!\r\n Função: Query.listCb()");
+			}
+		}
+
+		return l;
+
 	}
 
 }

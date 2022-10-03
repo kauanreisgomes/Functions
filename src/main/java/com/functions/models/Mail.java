@@ -20,19 +20,37 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
+import com.functions.Functions;
 
+/**
+ * @apiNote Classe Para envio de Email
+ * @author kauan reis
+ */
 public class Mail{
 
     static Properties pro = new Properties();
     static Session session;
+    String host="";
+    String porta="";
+    String email="";
 
-    public Mail(){
-        pro.put("mail.smtp.host", "mailpro03.redehost.com.br");
-        pro.put("mail.smtp.socketFactory.port", "587");
+    /**
+     * 
+     * @param host
+     * @param porta
+     * @param email
+     * @param pw
+     */
+    public Mail(String host, String porta, String email,String pw){
+        this.host=host;
+        this.porta=porta;
+        this.email=email;
+        pro.put("mail.smtp.host", host);
+        pro.put("mail.smtp.socketFactory.port", porta);
         pro.put("mail.smtp.socketFactory.class",
         "javax.net.ssl.SSLSocketFactory");
         pro.put("mail.smtp.auth", "true");
-        pro.put("mail.smtp.port", "587");
+        pro.put("mail.smtp.port", porta);
         
     
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
@@ -48,74 +66,72 @@ public class Mail{
             new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication()
                 {
-                        
-                            try {
-                                return new PasswordAuthentication("no-reply@maissabor.com.br",
-                                new String(Hex.decodeHex("4d4031732e7334623072")));
-                            } catch (DecoderException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                                System.out.println("Erro no PasswordAuthentication!\r\nClasse: Mail");
-                                return null;
-                            }
-                    
+                        return new PasswordAuthentication(email,pw);
                 }
             });
        
     }
 
     
-    public void sendSimpleMail(String subject,String texto,String emails) {
+    public void sendSimpleMail(String name_remetente,String subject,String texto,String emails) {
         //session.setDebug(true);
-        try {
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("no-reply@maissabor.com.br", "SSI - Suporte de Tecnologia da Informação"));
+        if(!Functions.isNull(email)){
+            try {
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(email, name_remetente));
 
-            Address[] toUser = InternetAddress //Destinatário(s)
-            .parse(emails);
-            
-            msg.setRecipients(Message.RecipientType.TO,toUser);
-            msg.setSubject(subject);
-            msg.setText(texto);
+                Address[] toUser = InternetAddress //Destinatário(s)
+                .parse(emails);
+                
+                msg.setRecipients(Message.RecipientType.TO,toUser);
+                msg.setSubject(subject);
+                msg.setText(texto);
 
-            Transport.send(msg);
-        }catch(UnsupportedEncodingException | MessagingException e){
-    
+                Transport.send(msg);
+            }catch(UnsupportedEncodingException | MessagingException e){
+        
+            }
+        }else{
+            System.out.println("Informe o email antes de enviar uma mensagem!\r\nFunção: Mail.sendSimpleMail().");
         }
     }
 
-    public void SendMessageHTML(String subject,String html,String emails){
-        //session.setDebug(true);
-        String htmlBody = html;         
-       // byte[] attachmentData = null; 
-        Multipart mp = new MimeMultipart();
-        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        Message msg = new MimeMessage(session);
+    public void SendMessageHTML(String name_remetente, String subject,String html,String emails){
+        if(!Functions.isNull(email)){
+            //session.setDebug(true);
+            String htmlBody = html;         
+        // byte[] attachmentData = null; 
+            Multipart mp = new MimeMultipart();
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            Message msg = new MimeMessage(session);
 
-        try {
-            msg.setFrom(new InternetAddress("no-reply@maissabor.com.br", "SSI - Suporte de Tecnologia da Informação"));
-            Address[] toUser = InternetAddress //Destinatário(s)
-            .parse(emails);
+            try {
+                msg.setFrom(new InternetAddress(email, name_remetente));
+                Address[] toUser = InternetAddress //Destinatário(s)
+                .parse(emails);
+                
+                msg.setRecipients(Message.RecipientType.TO,toUser);
+                msg.setSubject(subject);
             
-            msg.setRecipients(Message.RecipientType.TO,toUser);
-            msg.setSubject(subject);
-        
-            MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent(htmlBody, "text/html");
-            mp.addBodyPart(htmlPart);
-           
-            /* MimeBodyPart attachment = new MimeBodyPart();
-            InputStream attachmentDataStream = new ByteArrayInputStream(attachmentData);
-            attachment.setFileName("manual.pdf");
-            attachment.setContent(attachmentDataStream, "application/pdf");
-            mp.addBodyPart(attachment);*/
+                MimeBodyPart htmlPart = new MimeBodyPart();
+                htmlPart.setContent(htmlBody, "text/html");
+                mp.addBodyPart(htmlPart);
+            
+                /* MimeBodyPart attachment = new MimeBodyPart();
+                InputStream attachmentDataStream = new ByteArrayInputStream(attachmentData);
+                attachment.setFileName("manual.pdf");
+                attachment.setContent(attachmentDataStream, "application/pdf");
+                mp.addBodyPart(attachment);*/
 
-            msg.setContent(mp);
-            Transport.send(msg);
-        } catch (UnsupportedEncodingException | MessagingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            System.out.println("Erro ao mandar o E-mail!\r\nFunção: Mail.SendMessageHTML()");
+                msg.setContent(mp);
+                Transport.send(msg);
+            } catch (UnsupportedEncodingException | MessagingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("Erro ao mandar o E-mail!\r\nFunção: Mail.SendMessageHTML()");
+            }
+        }else{
+            System.out.println("Informe o email antes de enviar uma mensagem!\r\nFunção: Mail.SendMessageHTML().");
         }
     }
 

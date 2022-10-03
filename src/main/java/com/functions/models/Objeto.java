@@ -3,6 +3,10 @@ package com.functions.models;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @apiNote Classe objeto para abstrair qualquer classe.
+ * @author kauan reis
+ */
 public class Objeto {
 
     public List<List<Object>> l = new ArrayList<>();

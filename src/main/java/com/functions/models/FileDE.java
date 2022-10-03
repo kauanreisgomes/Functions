@@ -8,6 +8,10 @@ import java.util.Base64;
 
 import org.jasypt.util.text.BasicTextEncryptor;
 
+/**
+ * @apiNote Classe para encripitação e Decriptação de arquivos
+ * @author kauan reis
+ */
 public class FileDE {
   
 

@@ -10,12 +10,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.IllegalFormatException;
@@ -23,9 +24,8 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +35,7 @@ import org.json.JSONObject;
  */
 public class Functions {
 	public static int index;
-	
+	private volatile static HttpURLConnection connection;
 
 	
 	public static boolean isNull(Object value) {
@@ -488,6 +488,67 @@ public class Functions {
 		return null;
 	
 	}
+
+
+	public static List<Object> getJSONfromweb(Object[] parametros) {
+		BufferedReader reader;
+		String line;
+		StringBuffer responseContent = new StringBuffer();
+		List<Object> l = new ArrayList<>();
+		// Codificando login e senha para o formato url
+		/*login = URLEncoder.encode(login, StandardCharsets.UTF_8);
+		password = URLEncoder.encode(password, StandardCharsets.UTF_8);*/
+
+		try {
+			// Estabelecendo conexão
+			URL url = new URL((String)parametros[0]);
+			connection = (HttpURLConnection) url.openConnection();
+
+			connection.setRequestMethod("GET");
+			connection.setConnectTimeout(5000);
+			connection.setReadTimeout(5000);
+
+			int status = connection.getResponseCode();
+			if (status == 500) {
+				System.out.println("Erro ao acessar o serviço web!\r\nFunção: Functions.getJSONfromweb()");
+				l.add(false);
+			}
+			if (status == 200) {
+				reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				// Passando o corpo JSON
+				while ((line = reader.readLine()) != null) {
+					responseContent.append(line);
+				}
+				// Verificando o JSON
+			String responsebody = responseContent.toString();
+				if (responsebody.isEmpty() || responsebody == null) {
+					System.out.println("Sem corpo JSON!\r\n Função: Functions.getJSONfromweb()");
+					l.add(false);
+					
+				}
+				reader.close();
+				l.add(true);
+				if((int)parametros[1] == 1){
+					var jsonarray = new JSONObject(responsebody);
+					l.add(jsonarray);
+				}else{
+					var jsonarray = new JSONArray(responsebody);
+					l.add(jsonarray);
+				}
+			}
+
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			connection.disconnect();
+		}
+
+		return l;
+	}
+	
+
 
 	/**
 	 * @apiNote Cria um arquivo temporario no temp/GPE. Recebendo o local do arquivo que vai ser movido e o nome

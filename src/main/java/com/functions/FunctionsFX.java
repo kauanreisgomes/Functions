@@ -72,7 +72,8 @@ public class FunctionsFX {
 	 **/
 	public static void definevalues(String[] parametros, TableColumn<Object, String> t) {
 		if (parametros == null || t == null) {
-			dialogBox("Parametros não podem ser nulos!", 1);
+			Object[] msg = {"Atenção","Parametros não podem ser nulos!", 1};
+			dialogBox(msg);
 			return;
 		}
 		
@@ -142,9 +143,11 @@ public class FunctionsFX {
 	
 	public static void definevalues(String[] parametros, TableColumn<Object, String>[] tabelas,String[] style) {
 		if (parametros == null || tabelas == null) {
-			dialogBox("Parametros não podem ser nulos!", 1);
+			Object[] msg = {"Atenção","Parametros não podem ser nulos!", 1};
+			dialogBox(msg);
 		}else if(parametros.length != tabelas.length){
-			dialogBox("Erro ao definir os valores, parametros e tabelas tem valores diferentes!", 1);
+			Object[] msg = {"Atenção","Erro ao definir os valores, parametros e tabelas tem valores diferentes!", 1};
+			dialogBox(msg);
 		}else{
 			
 			for (int i = 0; i < parametros.length; i++) {
@@ -372,7 +375,8 @@ public class FunctionsFX {
 				return true;
 			}
 		}else{
-			dialogBox("Erro ao indentificar o tipo do objeto!", 1);
+			Object[] msg = {"Atenção","Erro ao indentificar o tipo do objeto!", 1};
+			dialogBox(msg);
 			System.out.println("Erro ao indentificar o tipo do objeto!\r\nFunção: FunctionsFX.isNull()");
 			return false;
 		}
@@ -410,7 +414,8 @@ public class FunctionsFX {
 					return true;
 				}
 			}else{
-				dialogBox("Erro ao indentificar o tipo do objeto! " + value.getClass(), 1);
+				Object[] msg = {"Atenção","Erro ao indentificar o tipo do objeto! "+ value.getClass(),1};
+				dialogBox(msg);
 				System.out.println("Erro ao indentificar o tipo do objeto!\r\nFunção: FunctionsFX.isNull(); Classe do Objeto:"+ value.getClass());
 				return true;
 			}
@@ -446,7 +451,8 @@ public class FunctionsFX {
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				dialogBox("Erro ao passar a data!", 1);
+				Object[] p = {"Atenção","Erro ao passar a data!\r\nFunção: FunctionsFX.parseDate()",1};
+				dialogBox(p);
 				return null;
 			}
 		} 
@@ -833,14 +839,15 @@ public class FunctionsFX {
 			tipo = ((String) lista[1]).toLowerCase();
 		}
 		
-
+		Object[] p = {"Atenção","",1};
 		if (res.equals("string")) {
-
+			p[1] = "Preecha todos os campos!";
 			if (tipo.equals("textfield") || tipo.equals("input")) {
 				for (int i = 2; i < lista.length; i++) {
 					TextInputControl tf = (TextInputControl) lista[i];
 					if (isNull(tf.getText())) {
-						dialogBox("Preecha todos os campos!", 1);
+						
+						dialogBox(p);
 						tf.requestFocus();
 						tf.setText(null);
 						return true;
@@ -850,19 +857,19 @@ public class FunctionsFX {
 				for (int i = 2; i < lista.length; i++) {
 					var var = (String) lista[i];
 					if (isNull(var)) {
-						dialogBox("Preecha todos os campos!", 1);
+						dialogBox(p);
 						return true;
 					}
 				}
 			}
 
 		} else if (res.equals("int") || res.equals("double") || res.equals("long")) {
-
+			p[1] = "Preencha os campos corretamente!";
 			if (tipo.equals("textfield")) {
 				for (int i = 2; i < lista.length; i++) {
 					TextInputControl tf = (TextInputControl) lista[i];
 					if (isNull(tf.getText()) || (Functions.filtro(tf.getText()) && res.equals("int"))) {
-						dialogBox("Preencha os campos corretamente!", 1);
+						dialogBox(p);
 						tf.requestFocus();
 						tf.setText(null);
 						return true;
@@ -870,7 +877,7 @@ public class FunctionsFX {
 						try{
 							Double.parseDouble(tf.getText());
 						}catch(NumberFormatException e){
-							dialogBox("Preencha os campos corretamente!", 1);
+							dialogBox(p);
 							tf.requestFocus();
 							tf.setText(null);
 							return true;
@@ -879,7 +886,7 @@ public class FunctionsFX {
 						try{
 							Long.parseLong(tf.getText());
 						}catch(NumberFormatException e){
-							dialogBox("Preencha os campos corretamente!", 1);
+							dialogBox(p);
 							tf.requestFocus();
 							tf.setText(null);
 							return true;
@@ -890,22 +897,20 @@ public class FunctionsFX {
 				for (int i = 2; i < lista.length; i++) {
 					var var = (String) lista[i];
 					if ((isNull(var) || Functions.filtro(var)) && res.equals("int")) {
-						dialogBox("Preencha todos os campos!", 1);
+						dialogBox(p);
 						return true;
 					}else if (res.equals("double")){
 						try{
 							Double.parseDouble(var);
 						}catch(NumberFormatException e){
-							dialogBox("Preencha os campos corretamente!", 1);
-							
+							dialogBox(p);
 							return true;
 						}
 					}else if (res.equals("long")){
 						try{
 							Long.parseLong(var);
 						}catch(NumberFormatException e){
-							dialogBox("Preencha os campos corretamente!", 1);
-							
+							dialogBox(p);
 							return true;
 						}
 					}
@@ -913,6 +918,7 @@ public class FunctionsFX {
 			}
 
 		} else if (res.equals("combobox")) {
+			p[1] = "Preecha todos os campos!";
 			int n = 2;
 			if(!lista[1].getClass().equals(String.class)){
 				n = 1;
@@ -921,7 +927,7 @@ public class FunctionsFX {
 				@SuppressWarnings("unchecked")
 				var cb = (ComboBox) lista[i];
 				if (cb.getValue() == null) {
-					dialogBox("Preencha todos os campos obrigatórios!", 1);
+					dialogBox(p);
 					cb.requestFocus();
 					return true;
 				}
@@ -930,21 +936,23 @@ public class FunctionsFX {
 		} else if (res.equals("dataehora")) {
 
 			if (tipo.equals("textfield")) {
+				p[1] = "Valor inválida ao campo!";
 				for (int i = 2; i < lista.length; i++) {
 					TextInputControl tf = (TextInputControl) lista[i];
 					if (isNull(tf.getText()) || Functions.filtro(tf.getText().replaceAll(":", ""))) {
-						dialogBox("Valor inválida ao campo!", 1);
+						dialogBox(p);
 						tf.requestFocus();
 						tf.setText(null);
 						return true;
 					}
 				}
 			} else if (tipo.equals("datepicker")) {
+				p[1] = "Selecione uma data!";
 				for (int i = 2; i < lista.length; i++) {
 					var dt = (DatePicker) lista[i];
 					if (dt.getValue() == null
 							|| Functions.filtro(dt.getValue().toString().replaceAll("/", "").replaceAll("-", ""))) {
-						dialogBox("Selecione uma data!", 1);
+						dialogBox(p);
 						dt.requestFocus();
 						dt.setValue(null);
 						return true;
@@ -953,40 +961,44 @@ public class FunctionsFX {
 			}
 
 		} else if(res.equals("checkbox")){
+			p[1] = "Selecione ao menos um item!";
 			for (int i = 2; i < lista.length; i++) {
 				var ck = (CheckBox)lista[i];
 				if(ck.isSelected()){
 					return false;
 				}
 			}
-			dialogBox("Selecione ao menos um item!", 1);
+			dialogBox(p);
 			var ck = (CheckBox)lista[3];
 			ck.requestFocus();
 			return true;
 		}
 		else if(res.equals("cpf/cnpj")){
+
 			for (int i = 2; i < lista.length; i++) {
 				TextField txtcnpjecpf = (TextField)lista[i];
 				if((txtcnpjecpf.getText().length() > 14 && (txtcnpjecpf.getText().contains(".") || txtcnpjecpf.getText().contains("-") || txtcnpjecpf.getText().contains("/"))) || (txtcnpjecpf.getText().length() > 12 && 
 				!(txtcnpjecpf.getText().contains(".") || txtcnpjecpf.getText().contains("-") || txtcnpjecpf.getText().contains("/")))){
+					p[1] = "Digite um cnpj válido!";
 					if(!(Functions.isCNPJ(txtcnpjecpf.getText().replace("-", "").replace(".", "").replace("/", "")))){
-						dialogBox("Digite um cnpj válido!", 1);
+						dialogBox(p);
 						txtcnpjecpf.requestFocus();
 						return true;
 					}
 					if(!(Functions.isCNPJ(txtcnpjecpf.getText().replace("-", "").replace(".", "").replace("/", "")))){
-						dialogBox("Digite um cnpj válido!", 1);
+						dialogBox(p);
 						txtcnpjecpf.requestFocus();
 						return true;
 					}
 				}else{
+					p[1] = "Digite um cpf válido!";
 					if(!(Functions.isCPF(txtcnpjecpf.getText().replace(".", "").replace("-", "")))){
-						dialogBox("Digite um cpf válido!", 1);
+						dialogBox(p);
 						txtcnpjecpf.requestFocus();
 						return true;
 					}
 					if(!(Functions.isCPF(txtcnpjecpf.getText().replace(".", "").replace("-", "")))){
-						dialogBox("Digite um cpf válido!", 1);
+						dialogBox(p);
 						txtcnpjecpf.requestFocus();
 						return true;
 					}
@@ -995,28 +1007,30 @@ public class FunctionsFX {
 		}
 		else if(res.equals("cpf")){
 			for (int i = 2; i < lista.length; i++) {
+				p[1] = "Digite um cpf válido!";
 				TextField txtcpf = (TextField)lista[i];
 				if(!(Functions.isCPF(txtcpf.getText().replace(".", "").replace("-", "")))){
-					dialogBox("Digite um cpf válido!", 1);
+					dialogBox(p);
 					txtcpf.requestFocus();
 					return true;
 				}
 				if(!(Functions.isCPF(txtcpf.getText().replace(".", "").replace("-", "")))){
-					dialogBox("Digite um cpf válido!", 1);
+					dialogBox(p);
 					txtcpf.requestFocus();
 					return true;
 				}
 			}
 		}else if(res.equals("cnpj")){
+			p[1] = "Digite um cnpj válido!";
 			for (int i = 2; i < lista.length; i++) {
 				TextField txtcnpj = (TextField)lista[i];
 				if(!(Functions.isCNPJ(txtcnpj.getText().replace("-", "").replace(".", "").replace("/", "")))){
-					dialogBox("Digite um cnpj válido!", 1);
+					dialogBox(p);
 					txtcnpj.requestFocus();
 					return true;
 				}
 				if(!(Functions.isCNPJ(txtcnpj.getText().replace("-", "").replace(".", "").replace("/", "")))){
-					dialogBox("Digite um cnpj válido!", 1);
+					dialogBox(p);
 					txtcnpj.requestFocus();
 					return true;
 				}
@@ -1345,26 +1359,32 @@ public class FunctionsFX {
 	}
 
     
-	// Funcao para o dialog warning e information
-	public static void dialogBox(String text, int index) {
+	/***
+	 * @apiNote 0 - *Header (String)
+	 * @apiNote 1 - *ContentText (String)
+	 * @see Função para criar um DialogBox. [*]Campos Obrigatórios
+	 * @param
+	 * @return
+	 */
+	public static void dialogBox(Object[] parametros) {
 		
 		Platform.runLater(()->{
 			Stage stage;
-			if (index == 1) {
+			if ((int)parametros[2] == 1) {
 				Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle("Mensagem de Atenção");
-				alert.setHeaderText("Atenção");
+				alert.setHeaderText((String)parametros[0]);
 				stage = (Stage) alert.getDialogPane().getScene().getWindow();
 				stage.getIcons().add(new Image(Functions.class.getResourceAsStream("images/Atencao.png")));
-				alert.setContentText(text);
+				alert.setContentText((String)parametros[1]);
 				alert.show();
-			} else if (index == 2) {
+			} else if ((int)parametros[2] == 2) {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Mensagem de Informação");
-				alert.setHeaderText("Atenção");
+				alert.setHeaderText((String)parametros[0]);
 				stage = (Stage) alert.getDialogPane().getScene().getWindow();
 				stage.getIcons().add(new Image(Functions.class.getResourceAsStream("images/information.png")));
-				alert.setContentText(text);
+				alert.setContentText((String)parametros[1]);
 	
 				alert.show();
 			}
@@ -1372,20 +1392,38 @@ public class FunctionsFX {
 		
 	}
 
-	// Funcao para o dialog confirmation.
-	public static Optional<ButtonType> ConfirmationDialog(String Header, String text) {
+	/***
+	 * @apiNote 0 - *Header (String)
+	 * @apiNote 1 - *ContentText (String)
+	 * @apiNote 2 -  ButtonType Focus 
+	 * @see Função para criar um ConfirmationDialog. [*]Campos Obrigatórios
+	 * @param
+	 * @return
+	 */
+	public static ButtonType ConfirmationDialog(Object[] parametros) {
 		
-			Stage stage;
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Confirmation Dialog");
-			alert.setHeaderText(Header);
-			stage = (Stage) alert.getDialogPane().getScene().getWindow();
-			stage.getIcons().add(new Image(Functions.class.getResourceAsStream("images/confirm.png")));
-			alert.setContentText(text);
-	
-			Optional<ButtonType> result = alert.showAndWait();
-			return result;
-		
+		Stage stage;
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirmation Dialog");
+		alert.setHeaderText((String)parametros[0]);
+		stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image(Functions.class.getResourceAsStream("view/Icons/confirm.png")));
+		alert.setContentText((String)parametros[1]);
+		if(parametros.length >= 3){
+			Button cancel = (Button)alert.getDialogPane().lookupButton(ButtonType.CANCEL);
+			Button ok = (Button)alert.getDialogPane().lookupButton(ButtonType.OK);
+			if(parametros[2] == ButtonType.OK){
+				ok.setDefaultButton(true);
+				cancel.setDefaultButton(false);
+			}else{
+				cancel.setDefaultButton(true);
+				ok.setDefaultButton(false);
+			}
+
+		}
+		Optional<ButtonType> result = alert.showAndWait();
+		//result.i
+		return result.get();
 		
 	}
 

@@ -72,21 +72,19 @@ public class FileChoose {
                 output.write(buffer);
                 is.close();
                 output.close();
-                FunctionsFX.dialogBox("Arquivo salvo com sucesso!", 2);
+                Object[] msg = {"Atenção","Arquivo salvo com sucesso!", 2};
+                FunctionsFX.dialogBox(msg);
                 return true;
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                FunctionsFX.dialogBox("Erro ao fazer o upload do arquivo!", 1);
-                e.printStackTrace();
-                return false;
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                FunctionsFX.dialogBox("Erro ao fazer o upload do arquivo!", 1);
+                Object[] msg = {"Atenção","Erro ao fazer o upload do arquivo!", 1};
+                FunctionsFX.dialogBox(msg);
                 e.printStackTrace();
                 return false;
-            }
+            } 
         }else{
-            FunctionsFX.dialogBox("Sem arquivo selecionado!", 1);
+            Object[] msg = {"Atenção","Sem arquivo selecionado!", 1};
+            FunctionsFX.dialogBox(msg);
             return false;
         }
     }
@@ -103,16 +101,15 @@ public class FileChoose {
                 output.write(buffer);
                 is.close();
                 output.close();
-                FunctionsFX.dialogBox("Arquivo salvo com sucesso!", 2);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                FunctionsFX.dialogBox("Erro ao fazer o upload do arquivo!", 1);
-                e.printStackTrace();
+                Object[] msg = {"Atenção","Arquivo salvo com sucesso!", 2};
+                FunctionsFX.dialogBox(msg);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                FunctionsFX.dialogBox("Erro ao fazer o upload do arquivo!", 1);
+                Object[] msg = {"Atenção","Erro ao fazer o upload do arquivo!", 1};
+                FunctionsFX.dialogBox(msg);
                 e.printStackTrace();
-            }
+            
+            } 
     }
 
 }

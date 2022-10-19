@@ -90,7 +90,8 @@ public class Loading {
                 s.setOnCloseRequest(new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
-                            FunctionsFX.dialogBox("Espere o processo terminar para fechar a tela!", 1);
+                            Object[] msg = {"Atenção","Para evitar problemas espere o processo terminar para fechar a tela!", 1};
+                            FunctionsFX.dialogBox(msg);
                             event.consume();                       
                     }
                 });
@@ -163,5 +164,9 @@ public class Loading {
     public void isVisible(boolean visible){
         loader_bar.setVisible(visible);
         loading.setVisible(visible);
+    }
+    
+    public void setClose(Object[] parametros){
+
     }
 }

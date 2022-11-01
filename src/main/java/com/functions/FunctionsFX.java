@@ -599,15 +599,18 @@ public class FunctionsFX {
 				
 						if(tf.getText().length() == 3 || tf.getText().length() == 7){
 							tf.setText(tf.getText() + ".");
+							tf.positionCaret(tf.getCaretPosition());
 						}else if(tf.getText().length() == 11){
 							tf.setText(tf.getText() + "-");
+							tf.positionCaret(tf.getCaretPosition());
 						}
 
 						if(tf.getText().length() > 14){
 							tf.setText(tf.getText().substring(0,14));
+							tf.positionCaret(tf.getCaretPosition());
 						}
 
-						tf.positionCaret(tf.getText().length());
+						
 					});
 
 				}
@@ -663,6 +666,7 @@ public class FunctionsFX {
 								tf.setText(tf.getText() + ".");
 							}else if(tf.getText().length() == 11){
 								tf.setText(tf.getText() + "-");
+								tf.positionCaret(tf.getCaretPosition());
 							}
 						}else{
 							String cnpj = tf.getText();
@@ -682,7 +686,7 @@ public class FunctionsFX {
 
 						
 
-						tf.positionCaret(tf.getText().length());
+						
 					});
 				}
 			}else if(tipo == 6){
@@ -817,6 +821,41 @@ public class FunctionsFX {
 									tf.setText(tf.getText() + ":");
 								}
 								tf.positionCaret(tf.getText().length());
+							}
+						}
+					});
+				}
+			}else if(tipo == 9){
+				//Formatação de texto para tirar os simbolos (') e (")
+				for (int i = 2; i < parametros.length; i++) {
+					
+					TextInputControl tf = ((TextInputControl)parametros[i]);
+					
+	
+					tf.focusedProperty().addListener((obs, wasFocused, isfocused)->{
+						if(!isfocused) {
+							if (tf.getText() == null || tf.getText().isEmpty()) {
+								tf.setText(null);
+							}else{
+								int caret = tf.getCaretPosition();
+								tf.setText(tf.getText().replace("\"", "").replace("'", ""));
+								tf.positionCaret(caret-1);
+							}
+						} 
+					});
+				
+					tf.setOnKeyReleased(e->{
+						if(!(e.getCode() == KeyCode.DELETE || e.getCode() == KeyCode.BACK_SPACE || e.getCode() == KeyCode.LEFT 
+						|| e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP || Functions.isNull(tf.getText()))) {
+
+							if (tf.getText() == null || tf.getText().isEmpty()) {
+								tf.setText(null);
+							}else{
+								if(tf.getText().contains("'") || tf.getText().contains("\"")) {
+									int caret = tf.getCaretPosition();
+									tf.setText(tf.getText().replace("\"", "").replace("'", ""));
+									tf.positionCaret(caret-1);
+								}
 							}
 						}
 					});
@@ -1149,7 +1188,7 @@ public class FunctionsFX {
 						if(!isNull(s) && c.getValue() != null){
 							
 							Objeto o = (Objeto) c.getValue();
-							if(s.equals(o.getsFirst(o.toString))){
+							if(s.equals(o.getsFirst(o.toString()))){
 								return o;
 							}else{
 								Object[] pc = {c};
@@ -1206,10 +1245,10 @@ public class FunctionsFX {
 		for (int i = 0; i < c.getItems().size(); i++) {
 			Objeto o = (Objeto)c.getItems().get(i);
 			
-			for (int j = 0; j < o.valuestosearch.size(); j++) {
+			for (int j = 0; j < o.getValuesToSearch().size(); j++) {
 				
-				if(o.getFirst(o.valuestosearch.get(j)) != null){
-					String value = ((String)o.getFirst(o.valuestosearch.get(j))).toLowerCase();
+				if(o.getFirst( o.getValuesToSearch().get(j)) != null){
+					String value = ((String)o.getFirst(o.getValuesToSearch().get(j))).toLowerCase();
 					
 					if(value.toLowerCase().trim().equals(c.getEditor().getText().toLowerCase().trim())){
 						c.getSelectionModel().select(i);
@@ -1241,10 +1280,10 @@ public class FunctionsFX {
 		for (int i = 0; i < c.getItems().size(); i++) {
 			Objeto o = (Objeto)c.getItems().get(i);
 			
-			for (int j = 0; j < o.valuestosearch.size(); j++) {
+			for (int j = 0; j < o.getValuesToSearch().size(); j++) {
 				
-				if(o.getFirst(o.valuestosearch.get(j)) != null){
-					String value = ((String)o.getFirst(o.valuestosearch.get(j))).toLowerCase();
+				if(o.getFirst(o.getValuesToSearch().get(j)) != null){
+					String value = ((String)o.getFirst(o.getValuesToSearch().get(j))).toLowerCase();
 					
 					if(value.toLowerCase().trim().equals(c.getEditor().getText().toLowerCase().trim())){
 						c.getSelectionModel().select(i);

@@ -1,9 +1,9 @@
 open module org.functions {
     requires java.base;
-    requires java.sql;
+    requires transitive java.sql;
     requires javax.mail.api;
     requires itextpdf;
-    requires org.json;
+    requires transitive org.json;
     requires jasypt;
     requires activation;
     requires org.apache.commons.codec;

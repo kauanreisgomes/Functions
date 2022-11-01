@@ -13,10 +13,10 @@ public class ConnectionFactory {
 			if(url.contains("mysql")){
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				dm = DriverManager.getConnection(url, user, pw);
-			}else if(url.contains("sqlserver")){
+			}else if(url.contains("oracle")){
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				dm = DriverManager.getConnection(url, user, pw);
-			}else if(url.contains("oracle")){
+			}else if(url.contains("sqlserver")){
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 				dm = DriverManager.getConnection(url);
 			}

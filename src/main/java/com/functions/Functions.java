@@ -464,40 +464,43 @@ public class Functions {
 	 * @apiNote Ler arquivos da pasta json, sendo necessário somento o File. 
 	 * @param arquivo
 	 * @return
-	 * @throws FileNotFoundException
 	 * @throws JSONException
 	 */
-	public static JSONObject JsonReader(File arquivo){
-		if(arquivo.exists()){
-			try (Scanner scanner = new Scanner(new FileInputStream(arquivo)).useDelimiter("\\n")) {
-				
-				String json = "";
-				while(scanner.hasNext()){
-					json += scanner.next();
-				}
-				JSONObject jsonobj = new JSONObject(json);
-				return jsonobj;
-			} catch (JSONException | FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public static JSONObject JsonReader(byte[] arquivo){
+		
+		try (Scanner scanner = new Scanner(new String(arquivo)).useDelimiter("\\n")) {
+			
+			String json = "";
+			while(scanner.hasNext()){
+				json += scanner.next();
 			}
-        }else{
-            
-        }
+			JSONObject jsonobj = new JSONObject(json);
+			return jsonobj;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+       
 		
 		return null;
 	
 	}
 
 
+
+	/**
+	 * @apiNote Transforma um JSON web em JSONObject ou JSONArray
+	 * @apiNote 0 - URL (String)
+	 * @apiNote 1 - Array ou Objeto? (0/1)
+	 * @param parametros
+	 * @return List
+	 */
 	public static List<Object> getJSONfromweb(Object[] parametros) {
 		BufferedReader reader;
 		String line;
 		StringBuffer responseContent = new StringBuffer();
 		List<Object> l = new ArrayList<>();
-		// Codificando login e senha para o formato url
-		/*login = URLEncoder.encode(login, StandardCharsets.UTF_8);
-		password = URLEncoder.encode(password, StandardCharsets.UTF_8);*/
+		
 
 		try {
 			// Estabelecendo conexão
@@ -845,4 +848,6 @@ public class Functions {
 		}
 		return sb.toString();
 	}
+
+	
 }

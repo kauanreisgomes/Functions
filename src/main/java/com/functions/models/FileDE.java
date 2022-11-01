@@ -33,4 +33,44 @@ public class FileDE {
 		return h.getBytes();
 	
 	}
+
+	public static byte[] encode(Object[] parametros){
+		int type = (int)parametros[0];
+		String pw = new String(Base64.getDecoder().decode(parametros[1].toString()));
+		String rtn = "";
+		BasicTextEncryptor bte = new BasicTextEncryptor();
+		bte.setPassword(pw);
+		switch(type){
+			case 1 : 
+				String value = (String)parametros[2];
+				rtn = bte.encrypt(value);
+				break;
+			case 2 : 
+				value = new String((byte[])parametros[2]);
+				rtn = bte.encrypt(value);
+				break;
+		}
+
+		return rtn.getBytes();
+	}
+
+	public static byte[] dencode(Object[] parametros){
+		int type = (int)parametros[0];
+		String pw = new String(Base64.getDecoder().decode(parametros[1].toString()));
+		String rtn = "";
+		BasicTextEncryptor bte = new BasicTextEncryptor();
+		bte.setPassword(pw);
+		switch(type){
+			case 1 : 
+				String value = (String)parametros[2];
+				rtn = bte.decrypt(value);
+				break;
+			case 2 : 
+				value = new String((byte[])parametros[2]);
+				rtn = bte.decrypt(value);
+				break;
+		}
+
+		return rtn.getBytes();
+	}
 }

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.functions.models.Combobox;
@@ -16,14 +17,14 @@ import com.functions.models.Objeto;
  * @author kauan reis
  */
 public class Query {
-    private volatile static Connection con;
-	private volatile static boolean open = false;
+    private volatile Connection con;
+	private volatile boolean open = false;
 	private volatile String url,user,pw;
 
 	/**
-	 * @apiNote SQL Server: jdbc:sqlserver://192.168.254.202:1433;databaseName=;user=;password=;encrypt=true;trustServerCertificate=true;hostNameInCertificate=cr2.eastus1-a.control.database.windows.net;loginTimeout=30;
+	 * @apiNote SQL Server: jdbc:sqlserver://192.168.254.202:1433;databaseName=teste;user=teste;password=123;encrypt=true;trustServerCertificate=true;hostNameInCertificate=cr2.eastus1-a.control.database.windows.net;loginTimeout=30;
 	 * @apiNote Oracle: jdbc:oracle:thin:@hostname:port:database
-	 * @apiNote MySQL: jdbc:mysql://localhost:33060/sakila
+	 * @apiNote MySQL: jdbc:mysql://localhost:3306/sakila
 	 * @param url
 	 * @param user
 	 * @param pw
@@ -48,6 +49,14 @@ public class Query {
 		}
 	}
 
+	private void VerifyConnection() throws SQLException{
+		if(open){
+			if(con == null || con.isClosed()){
+				con = ConnectionFactory.getConnection(url,user,pw);
+			}
+		}
+	}
+
     public List<Object> query(Object[] parametros) {
 		List<Object> lista = new ArrayList<>();
 		String sql = (String)parametros[0];
@@ -56,102 +65,85 @@ public class Query {
 			parametros[2] = ((String)parametros[2]).toLowerCase();
 		}
 		try {
-			if(open){
-				if(con == null || con.isClosed()){
-					con = ConnectionFactory.getConnection(url,user,pw);
+			VerifyConnection();
+			try (PreparedStatement ps = con.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
+				
+				if (parametros[1].equals("objeto")) {
+					Objeto obj = new Objeto();
+					ResultSetMetaData meta = rs.getMetaData();
+
+					while (rs.next()) {
+
+						obj = new Objeto();
+						for (int i = 1; i <= meta.getColumnCount(); i++) {
+
+							obj.set(meta.getColumnLabel(i), rs.getString(i));						
+							
+						}
+
+						lista.add(obj);
+					}
+
+				} else if (parametros[1].equals("objeto combobox")) {
+					Objeto obj = new Objeto();
+					ResultSetMetaData meta = rs.getMetaData();
+
+					while (rs.next()) {
+						
+						obj = new Objeto();
+
+						for (int i = 1; i <= meta.getColumnCount(); i++) {
+							
+							obj.set(meta.getColumnLabel(i), rs.getString(i));
+							
+						}
+
+					
+
+						obj.setToString((String)obj.getFirst((String)parametros[2]));
+						var values = new ArrayList<String>();
+
+						for (int i = 3; i < parametros.length; i++) {
+							values.add((String)parametros[i]);
+						}
+
+						obj.setValuesToSearch(values);
+
+						lista.add(obj);
+					}
+
+				} else if (parametros[1].equals("relatorio") || parametros[1].equals("objetos")) {
+					Objeto obj = new Objeto();
+					ResultSetMetaData meta = rs.getMetaData();
+
+					while (rs.next()) {
+						
+						
+
+						for (int i = 1; i <= meta.getColumnCount(); i++) {
+							
+							obj.set(meta.getColumnLabel(i), rs.getString(i));
+							
+						}
+						
+					}
+					
+					lista = new ArrayList<>();
+					lista.add(obj);
 				}
-			}
+
+			
+			} catch (NumberFormatException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
-		try (PreparedStatement ps = con.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
-			 
-
-			
-
-			if (parametros[1].equals("objeto")) {
-				Objeto obj = new Objeto();
-				ResultSetMetaData meta = rs.getMetaData();
-				List<Object> columname = new ArrayList<>();
-
-				for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-					columname.add(meta.getColumnLabel(i));
-					
-				}
-				while (rs.next()) {
-					List<Object> l = new ArrayList<>();
-					obj = new Objeto();
-					for (int i = 1; i <= meta.getColumnCount(); i++) {
-						l.add(rs.getString(i));
-					}
-					
-					obj.l.add(columname);
-					obj.l.add(l);
-					lista.add(obj);
-				}
-
-			} else if (parametros[1].equals("objeto combobox")) {
-				Objeto obj = new Objeto();
-				ResultSetMetaData meta = rs.getMetaData();
-				List<Object> columname = new ArrayList<>();
-
-				for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-					columname.add(meta.getColumnLabel(i));
-					
-				}
-				
-			
-				while (rs.next()) {
-					List<Object> l = new ArrayList<>();
-					obj = new Objeto();
-					for (int i = 1; i <= meta.getColumnCount(); i++) {
-						l.add(rs.getString(i));
-					}
-					obj.l.add(columname);
-					obj.l.add(l);
-					obj.toString = (String)obj.getFirst((String)parametros[2]);
-					for (int i = 3; i < parametros.length; i++) {
-						obj.valuestosearch.add((String)parametros[i]);
-					}
-
-					lista.add(obj);
-				}
-
-			} else if (parametros[1].equals("relatorio") || parametros[1].equals("objetos")) {
-				Objeto obj = new Objeto();
-				ResultSetMetaData meta = rs.getMetaData();
-				List<Object> l = new ArrayList<>();
-
-				for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-					l.add(meta.getColumnLabel(i));
-
-				}
-				obj.l.add(l);
-
-				while (rs.next()) {
-					l = new ArrayList<>();
-					for (int i = 1; i <= meta.getColumnCount(); i++) {
-						l.add(rs.getString(i));
-						
-					}
-
-					obj.l.add(l);
-				}
-				lista = new ArrayList<>();
-				lista.add(obj);
-			}
-
 		
-		} catch (NumberFormatException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 		return lista;
 
 	}
@@ -159,11 +151,7 @@ public class Query {
 	public List<Objeto> query(String[] parametros) {
 
 		try {
-			if(open){
-				if(con == null || con.isClosed()){
-					con = ConnectionFactory.getConnection(url,user,pw);
-				}
-			}
+			VerifyConnection();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -175,88 +163,82 @@ public class Query {
 		if(parametros.length>2){
 			parametros[2] = ((String)parametros[2]).toLowerCase();
 		}
-		try (PreparedStatement ps = con.prepareStatement(sql)) {
-			ResultSet rs = ps.executeQuery(); 
+		try (PreparedStatement ps = con.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery() ) {
+			
 
 			if (parametros[1].equals("objeto")) {
 				Objeto obj = new Objeto();
 				ResultSetMetaData meta = rs.getMetaData();
-				List<Object> columname = new ArrayList<>();
 
-				for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-					columname.add(meta.getColumnLabel(i));
-					
-				}
-				
-				
 				while (rs.next()) {
-					List<Object> l = new ArrayList<>();
+				
 					obj = new Objeto();
+
 					for (int i = 1; i <= meta.getColumnCount(); i++) {
-						l.add(rs.getString(i));
+						
+						obj.set(meta.getColumnLabel(i), rs.getString(i));
+
 					}
 				
-					obj.l.add(columname);
-					obj.l.add(l);
 					lista.add(obj);
 				}
 				
 				
 
-            } else if (parametros[1].equals("objeto combobox")) {
+            } 
+			
+			else if (parametros[1].equals("objeto combobox")) {
 				Objeto obj = new Objeto();
 				ResultSetMetaData meta = rs.getMetaData();
-				List<Object> columname = new ArrayList<>();
 
-				for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-					columname.add(meta.getColumnLabel(i));
-					
-				}
-				
-			
 				while (rs.next()) {
-					List<Object> l = new ArrayList<>();
+
 					obj = new Objeto();
+
+
 					for (int i = 1; i <= meta.getColumnCount(); i++) {
-						l.add(rs.getString(i));
+
+						obj.set(meta.getColumnLabel(i), rs.getString(i));
+
 					}
-					obj.l.add(columname);
-					obj.l.add(l);
-					obj.toString = (String)obj.getFirst((String)parametros[2]);
+
+					obj.setToString((String)obj.getFirst((String)parametros[2]));
+					List<String> values = new ArrayList<>();
+
 					for (int i = 3; i < parametros.length; i++) {
-						obj.valuestosearch.add((String)parametros[i]);
+						values.add((String)parametros[i]);
 					}
+
+					obj.setValuesToSearch(values);
 
 					lista.add(obj);
 				}
 
-			}else if (parametros[1].equals("relatorio") || parametros[1].equals("objetos")) {
+			}
+			
+			else if (parametros[1].equals("relatorio") || parametros[1].equals("objetos")) {
                 Objeto obj = new Objeto();
                 ResultSetMetaData meta = rs.getMetaData();
-                List<Object> l = new ArrayList<>();
-
-                for (int i = 1; i <= meta.getColumnCount(); i++) {
-
-                    l.add(meta.getColumnLabel(i));
-
-                }
-                obj.l.add(l);
-
+               
+              
+				HashMap<String,List<Object>> map = new HashMap<>();
+				for (int i = 1; i <= meta.getColumnCount(); i++) {
+					map.put(meta.getColumnLabel(i), new ArrayList<>());
+				}
                 while (rs.next()) {
-                    l = new ArrayList<>();
+            
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
-                        l.add(rs.getString(i));
-                        
-                    }
+						var values = map.get(meta.getColumnLabel(i));
+						values.add(rs.getString(i));
+						map.put(meta.getColumnLabel(i), values);
+					}
 
-                    obj.l.add(l);
                 }
+
                 lista = new ArrayList<>();
                 lista.add(obj);
             }
-			rs.close();
 			
 		} catch (NumberFormatException | SQLException e) {
 			// TODO Auto-generated catch block
@@ -273,26 +255,25 @@ public class Query {
 	 * @exception SQLException
 	 * @author Kauan t.i
 	 ***/
-	public boolean CED(String sql) {
+	public boolean CED(Object[] parametros) {
+
 		boolean value = false;
+		String sql = (String)parametros[0];
+
 		if (sql == null) {
 			return value;
 		}
 		try {
-			if(open){
-				if(con == null || con.isClosed()){
-					con = ConnectionFactory.getConnection(url,user,pw);
-				}
-			}
+			VerifyConnection();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return false;
 		}
 		try(PreparedStatement ps = con.prepareStatement(sql)){
-			
-			boolean r  = ps.execute();
-			
-			value = true;
+
+			value = ps.execute();
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -310,19 +291,18 @@ public class Query {
 	 * @exception SQLException
 	 * @author Kauan t.i
 	 ***/
-	public List<String> search(String sql) {
+	public List<String> search(Object[] parametros) {
 
 		List<String> dados = new ArrayList<>();
 		try {
-			if(open){
-				if(con == null || con.isClosed()){
-					con = ConnectionFactory.getConnection(url,user,pw);
-				}
-			}
+			VerifyConnection();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return null;
 		}
+
+		String sql = (String)parametros[0];
 		try(PreparedStatement ps = con.prepareStatement(sql)){
 			ResultSet rs = ps.executeQuery();
 
@@ -353,21 +333,19 @@ public class Query {
 	 * @exception SQLException
 	 * @author Kauan t.i
 	 ***/
-	public String Count(String sql) {
+	public String Count(Object[] parametros) {
 		String valor = "0";
+		String sql = (String)parametros[0];
 		if (sql == null) {
 			return valor;
 		}
 
 		try {
-			if(open){
-				if(con == null || con.isClosed()){
-					con = ConnectionFactory.getConnection(url,user,pw);
-				}
-			}
+			VerifyConnection();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return null;
 		}
 		
 		try(PreparedStatement ps = con.prepareStatement(sql)){
@@ -404,19 +382,17 @@ public class Query {
 	 * @exception SQLException
 	 * @author Kauan t.i
 	 ***/
-	public List<Combobox> listCb(String sql) {
+	public List<Combobox> listCb(Object[] parametros) {
 		List<Combobox> l = new ArrayList<>();
+		String sql = (String)parametros[0];
 		if (!(sql == null || sql.isEmpty())) {
 
 			try {
-				if(open){
-					if(con == null || con.isClosed()){
-						con = ConnectionFactory.getConnection(url,user,pw);
-					}
-				}
+				VerifyConnection();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				return null;
 			}
 
 			try(PreparedStatement ps = con.prepareStatement(sql)){

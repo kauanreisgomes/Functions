@@ -28,6 +28,7 @@ public class Loading {
     private Label loading;
     private ProgressBar loader_bar;
     private Object[] objectsblock;
+    private EventHandler<WindowEvent> even;
 
     public Loading(Stage stage, Thread th,Label loading, ProgressBar loader_bar, Timeline timeline){
         this.stage = stage;
@@ -87,6 +88,7 @@ public class Loading {
                 
                 scene.setCursor(Cursor.WAIT);
                 isVisible(true);
+                even = s.getOnCloseRequest();
                 s.setOnCloseRequest(new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
@@ -100,12 +102,7 @@ public class Loading {
         
                 timeline.pause();
                 scene.setCursor(Cursor.DEFAULT);
-                s.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
-                        s.close();
-                    }
-                });
+                s.setOnCloseRequest(even);
                 isVisible(false);
             }
         });

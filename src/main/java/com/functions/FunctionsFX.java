@@ -1446,7 +1446,7 @@ public class FunctionsFX {
 		alert.setTitle("Confirmation Dialog");
 		alert.setHeaderText((String)parametros[0]);
 		stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage.getIcons().add(new Image(Functions.class.getResourceAsStream("view/Icons/confirm.png")));
+		stage.getIcons().add(new Image(Functions.class.getResourceAsStream("images/confirm.png")));
 		alert.setContentText((String)parametros[1]);
 		if(parametros.length >= 3){
 			Button cancel = (Button)alert.getDialogPane().lookupButton(ButtonType.CANCEL);
@@ -1478,7 +1478,7 @@ public class FunctionsFX {
 		}
 		
 		stage = (Stage) td.getDialogPane().getScene().getWindow();
-		stage.getIcons().add(new Image(Functions.class.getResourceAsStream("confirm.png")));
+		stage.getIcons().add(new Image(Functions.class.getResourceAsStream("images/confirm.png")));
 		
 
 		Optional<String> result = td.showAndWait();

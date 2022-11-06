@@ -35,7 +35,7 @@ public class Objeto {
 
     public String getsFirst(String name_column){
         try{
-            String value = (String)map.get(name_column).get(0);
+            String value = (String)map.get(name_column.toLowerCase()).get(0);
             return value;
         }catch(NullPointerException e){
             return "";
@@ -44,7 +44,7 @@ public class Objeto {
     }
 
     public void set(String name_column, String Value){
-        List<Object> l = map.get(name_column);
+        List<Object> l = map.get(name_column.toLowerCase());
         if(l == null || l.isEmpty()){
             l = new ArrayList<>();
         }

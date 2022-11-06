@@ -272,7 +272,9 @@ public class Query {
 		}
 		try(PreparedStatement ps = con.prepareStatement(sql)){
 
-			value = ps.execute();
+			ps.execute();
+
+			value = true;
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

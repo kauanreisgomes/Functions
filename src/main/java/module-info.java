@@ -11,8 +11,9 @@ open module org.functions {
     requires org.apache.pdfbox;
     requires java.desktop;
     requires javafx.controls;
-    requires javafx.base;
+    requires transitive javafx.base;
     requires javafx.swing;
+    requires transitive javafx.graphics;
     requires org.controlsfx.controls;
   
 

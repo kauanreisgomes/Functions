@@ -32,6 +32,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -239,7 +240,7 @@ public class FunctionsFX {
 						if (parametros.length > 2) {
 							File f = new File(parametros[2]);
 							if(f.exists()){
-								btn.setGraphic(tratamentodeIcon(f));
+								btn.setGraphic(tratamentodeIcon(f.toPath().toString()));
 							}else{
 								System.out.println("Arquivo "+parametros[2]+" não existe!\r\nFunção: FunctionsFX.addbuttons().");
 							}
@@ -285,7 +286,7 @@ public class FunctionsFX {
 						if (parametros.length > 2) {
 							File f = new File(parametros[2]);
 							if(f.exists()){
-								btn.setGraphic(tratamentodeIcon(f));
+								btn.setGraphic(tratamentodeIcon(f.toPath().toString()));
 							}else{
 								System.out.println("Arquivo "+parametros[2]+" não existe!\r\nFunção: FunctionsFX.addbuttons2().");
 							}
@@ -326,7 +327,7 @@ public class FunctionsFX {
 	 * 
 	 * @apiNote *Posição 0 - local | Não pode ser nulo
 	 **/
-	public static ImageView tratamentodeIcon(File f) {
+	public static ImageView tratamentodeIcon(String f) {
 		
 		Image image;
 		try {
@@ -1325,8 +1326,8 @@ public class FunctionsFX {
 			
 			if(obj == null){
 				continue;
-			}else if(obj.getClass() == TextField.class){
-				TextField tf = (TextField)obj;
+			}else if(obj.getClass() == TextField.class || obj.getClass() == TextArea.class || obj.getClass() == PasswordField.class){
+				TextInputControl tf = (TextInputControl)obj;
 				tf.setText(null);
 			}else if(obj.getClass() == ComboBox.class){
 				ComboBox cb = (ComboBox)obj;
@@ -1334,9 +1335,6 @@ public class FunctionsFX {
 			}else if(obj.getClass() == CheckBox.class){
 				CheckBox ck = (CheckBox)obj;
 				ck.setSelected(false);
-			}else if(obj.getClass() == TextArea.class){
-				TextArea ta = (TextArea)obj;
-				ta.setText(null);
 			}else if(obj.getClass().equals(String.class)){
 				obj = "";
 			}else if(obj.getClass().equals(TableView.class)){
